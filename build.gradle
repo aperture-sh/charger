@@ -1,0 +1,43 @@
+subprojects {
+    version = '0.0.1-SNAPSHOT'
+    group = 'io.marauder'
+
+    plugins.withType(JavaPlugin) {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+
+        plugins.withType(MavenPlugin) {
+            javadoc {
+                // link to JRE6 documentation
+                options.author true
+                options.links 'http://download.oracle.com/javase/8/docs/api/'
+                options.links 'http://vertx.io/docs/apidocs/'
+            }
+            
+            // package javadoc into a jar file
+            task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
+                from javadoc.destinationDir
+                classifier = 'javadoc'
+            }
+
+            // package source into a jar file
+            task packageSources(type: Jar) {
+                from sourceSets.main.allSource
+                classifier = 'sources'
+            }
+
+            // define artifacts for upload
+            artifacts {
+                archives jar
+                archives packageJavadoc
+                archives packageSources
+            }
+            
+        }
+    }
+
+    ext {
+        kotlinVersion = '3.11.0'
+    }
+
+}

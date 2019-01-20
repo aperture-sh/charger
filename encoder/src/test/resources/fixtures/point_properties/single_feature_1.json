@@ -1,0 +1,15 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      1024,
+      1024
+    ]
+  },
+  "properties": { 
+  	"hello": "world",
+  	"numeric": 2,
+  	"float": 3.3
+  }
+}

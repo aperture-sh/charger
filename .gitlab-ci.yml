@@ -1,0 +1,32 @@
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+  - touch ~/.bashrc
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+build:
+  image: openjdk:8
+  stage: build
+  script:
+    - ./gradlew build -x test
+  artifacts:
+    paths:
+    - build
+    expire_in: 30 minutes
+
+test:
+  image: openjdk:8
+  stage: test
+  script:
+    - ./gradlew check
+
+publish:
+  image: openjdk:8
+  stage: deploy
+  script:
+      - ./gradlew publish
+  only:
+      - master@marauder/supercharger

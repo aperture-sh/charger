@@ -1,0 +1,7 @@
+include 'clipping'
+include 'encoder'
+include 'models'
+include 'projector'
+include 'utils'
+
+rootProject.name = 'supercharger'
