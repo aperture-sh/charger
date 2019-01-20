@@ -27,6 +27,6 @@ publish:
   image: openjdk:8
   stage: deploy
   script:
-      - ./gradlew publish
+      - ./gradlew upload
   only:
       - master@marauder/supercharger

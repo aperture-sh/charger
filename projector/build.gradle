@@ -13,9 +13,9 @@ buildscript {
 }
 
 apply plugin: 'kotlin'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
 
-group 'io.marauder'
+group 'io.marauder.supercharger'
 version '0.0.1-SNAPSHOT'
 
 sourceSets {
@@ -46,27 +46,3 @@ dependencies {
 test {
     useJUnitPlatform()
 }
-
-/*artifactory {
-    contextUrl = "$System.env.artifactory_contextUrl"
-    publish {
-        repository {
-            repoKey = "libs-${ version.endsWith('-SNAPSHOT') ? 'snapshot' : 'release' }-local"
-            username = "$System.env.artifactory_user"
-            password = "$System.env.artifactory_password"
-
-        }
-        defaults {
-            publications ('mavenKotlin')
-        }
-    }
-}*/
-
-publishing {
-    publications {
-        mavenKotlin(MavenPublication) {
-            from components.java
-        }
-    }
-}
-
