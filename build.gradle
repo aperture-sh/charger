@@ -11,7 +11,6 @@ subprojects {
                 // link to JRE6 documentation
                 options.author true
                 options.links 'http://download.oracle.com/javase/8/docs/api/'
-                options.links 'http://vertx.io/docs/apidocs/'
             }
             
             // package javadoc into a jar file
