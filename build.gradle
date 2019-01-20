@@ -1,6 +1,6 @@
 subprojects {
     version = '0.0.1-SNAPSHOT'
-    group = 'io.marauder'
+    group = 'io.marauder.supercharger'
 
     plugins.withType(JavaPlugin) {
         sourceCompatibility = '1.8'
