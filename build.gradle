@@ -1,3 +1,21 @@
+apply plugin: 'maven'
+
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+        maven { url "https://kotlin.bintray.com/kotlinx" }
+    }
+
+    group = 'io.marauder.supercharger'
+    version = '0.0.1-SNAPSHOT'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
 subprojects {
     version = '0.0.1-SNAPSHOT'
     group = 'io.marauder.supercharger'
@@ -42,7 +60,7 @@ subprojects {
     plugins.withType(MavenPlugin) {
 
         uploadArchives.repositories.mavenDeployer {
-            // upload to sonatype OSS
+            // upload to geocode artifactory
             repository(url: "https://geocode.igd.fraunhofer.de:8081/artifactory/libs-release-local") {
                 authentication(userName: rootProject.hasProperty('artifactory_user') ? "$artifactory_user" : "$System.env.artifactory_user",
                     password: rootProject.hasProperty('artifactory_password') ? "$artifactory_password" : "$System.env.artifactory_password")
@@ -87,4 +105,64 @@ subprojects {
         }
     }
 
+}
+
+configurations {
+    childJars
+}
+
+dependencies {
+    subprojects.each {
+        childJars project(it.path)
+    }
+}
+
+jar {
+    dependsOn configurations.childJars
+    from { configurations.childJars.collect { zipTree(it) } }
+}
+
+uploadArchives.repositories.mavenDeployer {
+    // upload to geocode artifactory
+    repository(url: "https://geocode.igd.fraunhofer.de:8081/artifactory/libs-release-local") {
+        authentication(userName: rootProject.hasProperty('artifactory_user') ? "$artifactory_user" : "$System.env.artifactory_user",
+                password: rootProject.hasProperty('artifactory_password') ? "$artifactory_password" : "$System.env.artifactory_password")
+    }
+    snapshotRepository(url: "https://geocode.igd.fraunhofer.de:8081/artifactory/libs-snapshot-local") {
+        authentication(userName: this.hasProperty('artifactory_user') ? "$artifactory_user" : "$System.env.artifactory_user",
+                password: this.hasProperty('artifactory_password') ? "$artifactory_password" : "$System.env.artifactory_password")
+    }
+
+    // ensure correct artifact ID
+    pom.artifactId = project.name
+
+    // pom file details
+    pom.project {
+        name 'supercharger'
+        packaging 'jar'
+        description 'A Collection of Vector Tile Tools including the supercharged Encoder!'
+        url 'http://marauder.io/supercharger'
+
+        scm {
+            url 'scm:git:git://geocode.igd.fraunhofer.de/marauder/supercharger.git'
+            connection 'scm:git:git://geocode.igd.fraunhofer.de/marauder/supercharger.git'
+            developerConnection 'scm:git:git://geocode.igd.fraunhofer.de/marauder/supercharger.git'
+        }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'florian-zouhar'
+                name 'Florian Zouhar'
+                email 'florian.zouhar@igd.fraunhofer.de'
+            }
+        }
+    }
 }
