@@ -2,6 +2,9 @@ package io.marauder.supercharged
 
 import io.marauder.supercharged.models.GeoJSON
 
+/**
+ * Intersector Helper Functions
+ */
 class Intersector {
     fun intersects(b1: List<Double>, b2: List<Double>): Boolean =
             (b1[0] < b2[2] && b1[2] > b2[0] && b1[3] > b2[1] && b1[1] < b2[3])
@@ -12,6 +15,11 @@ class Intersector {
     fun includesPoint(b: List<Double>, coord: List<Double>): Boolean =
             coord[0] < b[2] && coord[0] > b[0] && coord[1] < b[3] && coord[1] > b[1]
 
+    /**
+     * Is a feature collection out of given bounds using a scaling factor
+     * @param axis 0 is x, 1 is y
+     * @return 1 if feature collection is out of higher bounds, 2 if feature collection is out of lower bound, 0 if intersects
+     */
     fun fcOutOfBounds(fc: GeoJSON, scale: Double, k1: Double, k2: Double, axis: Int) : Int {
         val scaleK1 = k1 / scale
         val scaleK2 = k2 / scale
