@@ -1,0 +1,8 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates":[[[ 512, 512 ], [ 512, 1536 ], [ 1536, 1536 ], [ 512, 1536 ], [ 512, 512 ]]]
+  },
+  "properties": {  }
+}
