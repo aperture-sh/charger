@@ -2,11 +2,23 @@ package io.marauder.supercharged
 
 import io.marauder.supercharged.models.*
 
+/**
+ * Projector provides vector tile specific projection and transformation functions
+ * @property extend tile pixel resolution
+ */
 class Projector(val extend: Int = 4096) {
+
+    /**
+     * Project features into CRS 0 to 1
+     * @param featureCollection Feature Collection to project
+     */
     fun projectFeatures(featureCollection: GeoJSON): GeoJSON =
             GeoJSON(featureCollection.type, featureCollection.features.map { f -> projectFeature(f) })
 
-
+    /**
+     * Project feature into CRS 0 to 1
+     * @param f Feature to project
+     */
     fun projectFeature(f: Feature): Feature {
         val geometry = when(f.geometry) {
             is Geometry.Point -> Geometry.Point(GeometryType.Point, projectPoint((f.geometry as Geometry.Point).coordinates))
@@ -40,6 +52,10 @@ class Projector(val extend: Int = 4096) {
         )
     }
 
+    /**
+     * Project point into CRS 0 to 1
+     * @param p Point to project
+     */
     fun projectPoint(p: List<Double>): List<Double> {
         val sin = Math.sin(p[1] * Math.PI / 180)
         val x = p[0] / 360 + 0.5
@@ -53,8 +69,14 @@ class Projector(val extend: Int = 4096) {
         return listOf(x, y)
     }
 
+    /**
+     * Calculate bounding box for feature
+     */
     fun calcBbox(f: Feature) = calcBbox(foldCoordinates(f), f.bbox)
 
+    /**
+     * Calculate Bounding box for list of points
+     */
     fun calcBbox(points: List<List<Double>>, bbox: MutableList<Double>) {
         points.forEach {p ->
             bbox[0] = Math.min(p[0], bbox[0])
@@ -64,6 +86,9 @@ class Projector(val extend: Int = 4096) {
         }
     }
 
+    /**
+     * Calculate bounding box for feature collection
+     */
     fun calcBbox(f: GeoJSON) {
         f.features.forEach {
             calcBbox(it)
@@ -74,8 +99,15 @@ class Projector(val extend: Int = 4096) {
         }
     }
 
+
+    /**
+     * Calculate bounding box for tile extend
+     */
     fun tileBBox(z: Int, x: Int, y: Int) = listOf(tileToLon(x, z), tileToLat( y+1, z), tileToLon(x+1, z), tileToLat(y, z))
 
+    /**
+     * Extract list of points from a features geometries
+     */
     fun foldCoordinates(f: Feature) : List<List<Double>> {
         return when(f.geometry) {
             is Geometry.Point -> listOf((f.geometry as Geometry.Point).coordinates)
@@ -105,6 +137,9 @@ class Projector(val extend: Int = 4096) {
         }
     }
 
+    /**
+     * Transform coordinates into tile extend
+     */
     fun transformTile(t: Tile) : Tile =
             Tile(GeoJSON(features = t.geojson.features.map {
                 Feature(
@@ -119,6 +154,9 @@ class Projector(val extend: Int = 4096) {
                     t.y
             )
 
+    /**
+     * Transform coordinates into tile extend
+     */
     fun transformGeometry(g: Geometry, z: Int, x: Int, y: Int) : Geometry = when(g) {
         is Geometry.Point -> Geometry.Point(coordinates = transformPoint(g.coordinates, extend, z, x, y))
         is Geometry.MultiPoint -> Geometry.MultiPoint(coordinates = g.coordinates.let { p ->
@@ -152,14 +190,26 @@ class Projector(val extend: Int = 4096) {
         })
     }
 
+    /**
+     * Transform coordinates into tile extend
+     */
     fun transformPoint(p: List<Double>, extend: Int, z: Int, x: Int, y: Int) : List<Double> =
             listOf(Math.round(extend * (p[0] * z - x)).toDouble(), Math.round(extend * (p[1] * z - y)).toDouble())
 
+    /**
+     * Transform bounding box coordinates into tile extend
+     */
     fun transformBBox(z: Int, x: Int, y: Int, bbox: List<Double>) : List<Double> =
                     transformPoint(projectPoint(bbox.subList(0,1)), extend, 1 shl z, x, y) +
                     transformPoint(projectPoint(bbox.subList(2,3)), extend, 1 shl z, x, y)
 
+    /**
+     * Calculate longtitude for top left tile corner
+     */
     fun tileToLon(x: Int, z: Int) = x.toDouble() / Math.pow(2.0, z.toDouble()) * 360.0 - 180.0
 
+    /**
+     * Calculate latitude for top left tile corner
+     */
     fun tileToLat(y: Int, z: Int) = Math.toDegrees(Math.atan(Math.sinh(Math.PI - (2.0 * Math.PI * y.toDouble()) / Math.pow(2.0, z.toDouble()))))
 }
