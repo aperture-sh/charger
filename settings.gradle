@@ -1,4 +1,4 @@
-include 'clipping'
+include 'clipper'
 include 'encoder'
 include 'models'
 include 'projector'
