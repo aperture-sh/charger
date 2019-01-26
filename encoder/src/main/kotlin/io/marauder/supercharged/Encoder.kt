@@ -29,6 +29,7 @@ class Encoder(private val extend: Int = 4096) {
      * @param inject A list containing features to be merged into new tile
      * @return A [vector_tile.VectorTile.Tile] object ready to be serialized
      */
+    @JvmOverloads
     fun encode(features: List<Feature>,
                layerName: String,
                keys: MutableMap<String, Int> = mutableMapOf(),
@@ -94,31 +95,8 @@ class Encoder(private val extend: Int = 4096) {
 
         layer.addAllKeys(keys.map { it.key })
 
-        val encoded = features.flatMap { f ->
-            val feature = vector_tile.VectorTile.Tile.Feature.newBuilder()
-            feature.id = f.id.toLongOrNull() ?: 0
-            val tags = mutableListOf<Int>()
-            f.properties.forEach {
-                tags.add(keys[it.key] ?: 0)
-                val value = when (it.value) {
-                    is Value.IntValue -> it.value
-                    is Value.DoubleValue -> it.value
-                    else -> it.value
-                }
-                tags.add(values[value] ?: 0)
-            }
-            feature.addAllTags(tags)
-            val geometry = encodeGeometry(f.geometry)
-            if (geometry.isNotEmpty()) feature.addAllGeometry(geometry)
-            when (f.geometry) {
-                is Geometry.Point -> feature.type = VectorTile.Tile.GeomType.POINT
-                is Geometry.MultiPoint -> feature.type = VectorTile.Tile.GeomType.POINT
-                is Geometry.LineString -> feature.type = VectorTile.Tile.GeomType.LINESTRING
-                is Geometry.MultiLineString -> feature.type = VectorTile.Tile.GeomType.LINESTRING
-                is Geometry.Polygon -> feature.type = VectorTile.Tile.GeomType.POLYGON
-                is Geometry.MultiPolygon -> feature.type = VectorTile.Tile.GeomType.POLYGON
-            }
-            listOf(feature.build())
+        val encoded = features.map { f ->
+            encodeFeature(f, keys, values)
         }
 
         layer.addAllFeatures(inject)
@@ -127,6 +105,59 @@ class Encoder(private val extend: Int = 4096) {
 
         return tile.build()
     }
+
+    /**
+     * Encodes a [Feature] for later serialization.
+     * The parameters [keys] and [values] provide tag ids to be used for encoding.
+     * @param feature [Feature] to encode
+     * @param keys A map of property keys and tag ids to use for encoding
+     * @param values A map of property values and tag ids to use for encoding
+     * @return A [vector_tile.VectorTile.Tile.Feature] object ready to be serialized
+     */
+    @JvmOverloads
+    fun encodeFeature(feature: Feature,
+                      keys: MutableMap<String, Int> = mutableMapOf(),
+                      values: MutableMap<Value, Int> = mutableMapOf()
+    ) : VectorTile.Tile.Feature {
+        val featureBuilder = vector_tile.VectorTile.Tile.Feature.newBuilder()
+        featureBuilder.id = feature.id.toLongOrNull() ?: 0
+        val tags = mutableListOf<Int>()
+        feature.properties.forEach {
+            tags.add(keys[it.key] ?: 0)
+            val value = when (it.value) {
+                is Value.IntValue -> it.value
+                is Value.DoubleValue -> it.value
+                else -> it.value
+            }
+            tags.add(values[value] ?: 0)
+        }
+        featureBuilder.addAllTags(tags)
+        val geometry = encodeGeometry(feature.geometry)
+        if (geometry.isNotEmpty()) featureBuilder.addAllGeometry(geometry)
+        when (feature.geometry) {
+            is Geometry.Point -> featureBuilder.type = VectorTile.Tile.GeomType.POINT
+            is Geometry.MultiPoint -> featureBuilder.type = VectorTile.Tile.GeomType.POINT
+            is Geometry.LineString -> featureBuilder.type = VectorTile.Tile.GeomType.LINESTRING
+            is Geometry.MultiLineString -> featureBuilder.type = VectorTile.Tile.GeomType.LINESTRING
+            is Geometry.Polygon -> featureBuilder.type = VectorTile.Tile.GeomType.POLYGON
+            is Geometry.MultiPolygon -> featureBuilder.type = VectorTile.Tile.GeomType.POLYGON
+        }
+        return featureBuilder.build()
+    }
+
+    /**
+     * Encodes a [Geometry] for later serialization.
+     * @param geometry [Geometry] to encode
+     * @return A [List] of [Int] values representing the geometry
+     */
+    fun encodeGeometry(geometry: Geometry) = if (geometryValid(geometry)) when (geometry) {
+        is Geometry.Point -> encodePoint(geometry).first
+        is Geometry.MultiPoint -> encodeMultiPoint(geometry)
+        is Geometry.LineString -> encodeLineString(geometry).first
+        is Geometry.MultiLineString -> encodeMultiLineString(geometry)
+        is Geometry.Polygon -> encodePolygon(geometry).first
+        is Geometry.MultiPolygon -> encodeMultiPolygon(geometry)
+    } else emptyList()
 
     /**
      * Serialize one tile
@@ -236,16 +267,6 @@ class Encoder(private val extend: Int = 4096) {
         tile.setLayers(0, layer1.addAllFeatures(features).build())
         return tile.build()
     }
-
-
-    private fun encodeGeometry(geometry: Geometry) = if (geometryValid(geometry)) when (geometry) {
-            is Geometry.Point -> encodePoint(geometry).first
-            is Geometry.MultiPoint -> encodeMultiPoint(geometry)
-            is Geometry.LineString -> encodeLineString(geometry).first
-            is Geometry.MultiLineString -> encodeMultiLineString(geometry)
-            is Geometry.Polygon -> encodePolygon(geometry).first
-            is Geometry.MultiPolygon -> encodeMultiPolygon(geometry)
-    } else emptyList()
 
     private fun geometryValid(geometry: Geometry) = when (geometry) {
         is Geometry.Point -> geometry.coordinates.isNotEmpty()
