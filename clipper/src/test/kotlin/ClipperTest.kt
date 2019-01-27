@@ -19,7 +19,7 @@ class ClipperTest {
     @Test
     fun clipPoint() {
         val feature = readFeature("geometries", "point")
-        val clipped = clipper.clip(GeoJSON(features = listOf(feature)), 1.0, 0.0, 500.0, 0.0, 500.0, false)
+        val clipped = clipper.clip(GeoJSON(features = listOf(feature)), 1.0, 0.0, 1500.0, 0.0, 1500.0, false)
         clipped.features.forEach { f ->
             assertThat((f.geometry as Geometry.Point).coordinates[0]).isEqualTo((feature.geometry as Geometry.Point).coordinates[0])
             assertThat((f.geometry as Geometry.Point).coordinates[1]).isEqualTo((feature.geometry as Geometry.Point).coordinates[1])
