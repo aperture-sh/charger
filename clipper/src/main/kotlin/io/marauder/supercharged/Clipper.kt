@@ -8,7 +8,7 @@ import io.marauder.supercharged.models.Geometry
  * The clipper provides functions to clip generic geometries and given boundaries
  * @property calcBoundingBoxes If true calculate bounding boxes before clipping
  */
-class Clipper(val calcBoundingBoxes: Boolean = false) {
+class Clipper(private val calcBoundingBoxes: Boolean = false) {
 
     /**
      * Clip a feature collection at given boundaries and a scaling factor
@@ -20,7 +20,7 @@ class Clipper(val calcBoundingBoxes: Boolean = false) {
      * @param k4 high vertical boundary
      * @return Clipped Feature Collection
      */
-    fun clip(fc: GeoJSON, scale: Double, k1: Double, k2: Double, k3: Double, k4: Double) : GeoJSON {
+    fun clip(fc: GeoJSON, scale: Double, k1: Double, k2: Double, k3: Double, k4: Double, checkBoundingBox: Boolean = true) : GeoJSON {
         val scaleK1 = k1 / scale
         val scaleK2 = k2 / scale
         val scaleK3 = k3 / scale
@@ -30,7 +30,7 @@ class Clipper(val calcBoundingBoxes: Boolean = false) {
         val minFCy = fc.bbox[1]
         val maxFCy = fc.bbox[2 + 1]
 
-        if (minFCx >= scaleK2 || maxFCx <= scaleK1 || minFCy >= scaleK4 || maxFCy <= scaleK3) {
+        if (checkBoundingBox && (minFCx >= scaleK2 || maxFCx <= scaleK1 || minFCy >= scaleK4 || maxFCy <= scaleK3)) {
             return GeoJSON(features = emptyList())
         }
         return GeoJSON(features =
@@ -40,25 +40,26 @@ class Clipper(val calcBoundingBoxes: Boolean = false) {
             val minY = f.bbox[1]
             val maxY = f.bbox[2 + 1]
         // condition for trivia reject
-            !(minX > scaleK2 || maxX < scaleK1 || minY > scaleK4 || maxY < scaleK3)
+            !(minX > scaleK2 || maxX < scaleK1 || minY > scaleK4 || maxY < scaleK3) || !checkBoundingBox
         }.flatMap { f ->
             when (f.geometry) {
-                is Geometry.Point -> listOf(f)
+                is Geometry.Point -> listOf(Feature(
+                        geometry = Geometry.Point(coordinates = filterPoints(listOf((f.geometry as Geometry.Point).coordinates), scaleK1, scaleK2, scaleK3, scaleK4).firstOrNull() ?: emptyList()),
+                        properties = f.properties
+                ))
                 is Geometry.MultiPoint -> listOf(Feature(
                         geometry = Geometry.MultiPoint(coordinates = filterPoints((f.geometry as Geometry.MultiPoint).coordinates, scaleK1, scaleK2, scaleK3, scaleK4)),
                         properties = f.properties
                 ))
                 is Geometry.LineString -> {
-                    listOf(Feature(geometry = Geometry.Polygon(
-                            coordinates = clipLine(clipLine((f.geometry as Geometry.Polygon).coordinates, scaleK1, scaleK2, 0), scaleK3, scaleK4, 1)),
+                    listOf(Feature(geometry = Geometry.LineString(
+                            coordinates = clipLine(clipLine(listOf((f.geometry as Geometry.LineString).coordinates), scaleK1, scaleK2, 0), scaleK3, scaleK4, 1).firstOrNull() ?: emptyList()),
                             properties = f.properties)
                     )
                 }
                 is Geometry.MultiLineString -> {
-                    listOf(Feature(geometry = Geometry.MultiPolygon(
-                            coordinates = (f.geometry as Geometry.MultiPolygon).coordinates.map {
-                                clipLine(clipLine(it, scaleK1, scaleK2, 0), scaleK3, scaleK4, 1)
-                            }
+                    listOf(Feature(geometry = Geometry.MultiLineString(
+                            coordinates = clipLine(clipLine((f.geometry as Geometry.MultiLineString).coordinates, scaleK1, scaleK2, 0), scaleK3, scaleK4, 1)
                     )))
                 }
                 is Geometry.Polygon -> {
@@ -83,7 +84,7 @@ class Clipper(val calcBoundingBoxes: Boolean = false) {
 
     private fun filterPoints(coordinates: List<List<Double>>, scaleK1: Double, scaleK2: Double, scaleK3: Double, scaleK4: Double) =
             coordinates.filter {
-                it[0] > scaleK2 || it[0] < scaleK1 || it[1] > scaleK4 || it[1] < scaleK3
+                !(it[0] > scaleK2 || it[0] < scaleK1 || it[1] > scaleK4 || it[1] < scaleK3)
             }
 
     private fun clipPolygon(g: List<List<List<Double>>>, k1: Double, k2: Double, axis: Int): List<List<List<Double>>> {
@@ -163,14 +164,14 @@ class Clipper(val calcBoundingBoxes: Boolean = false) {
                     }
                 } else {
                     slice.add(line[i])
-                    if (line[i + 1][axis] < k1) {
-                        slice.add(intersect(line[i], line[i + 1], k1, axis))
+                    when {
+                        line[i + 1][axis] < k1 -> slice.add(intersect(line[i], line[i + 1], k1, axis))
                         // <--|---  |
-                    } else if (line[i + 1][axis] > k2) {
-                        slice.add(intersect(line[i], line[i + 1], k2, axis))
+                        line[i + 1][axis] > k2 -> slice.add(intersect(line[i], line[i + 1], k2, axis))
                         // |  ---|-->
+                        i >= line.size - 2 -> slice.add(line[i+1])
+                        // | --> |
                     }
-                    // | --> |
                 }
             }
 
