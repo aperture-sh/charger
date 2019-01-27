@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## Current Snapshot
 
---
+* Split encoder and models into separate modules
 
 ## [0.0.2] - 2018-01-20
 
