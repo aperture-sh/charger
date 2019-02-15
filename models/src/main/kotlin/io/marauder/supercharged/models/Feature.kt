@@ -18,5 +18,5 @@ data class Feature(
         val type: GeoJsonType = GeoJsonType.Feature,
         @Serializable(with=GeometrySerializer::class) val geometry: Geometry,
         val properties: Map<String, Value> = emptyMap(),
-        @Optional @Transient val bbox: MutableList<Double> = mutableListOf(Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE)
+        @Optional @Transient val bbox: MutableList<Double> = mutableListOf(Double.MAX_VALUE, Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE)
 )

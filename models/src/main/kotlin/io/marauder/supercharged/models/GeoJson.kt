@@ -23,5 +23,5 @@ enum class GeoJsonType {
 data class GeoJSON(
         val type: GeoJsonType = GeoJsonType.FeatureCollection,
         val features: List<Feature>,
-        @Optional @Transient val bbox: MutableList<Double> = mutableListOf(Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE)
+        @Optional @Transient val bbox: MutableList<Double> = mutableListOf(Double.MAX_VALUE, Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE)
 )
