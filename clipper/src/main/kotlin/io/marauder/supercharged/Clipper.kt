@@ -126,12 +126,15 @@ class Clipper(private val calcBoundingBoxes: Boolean = false) {
                 }
             }
 
-            val a = ring.last()
-            if (a[axis] in k1..k2) slice.add(a)
-            if (slice.isNotEmpty() && (slice[0][0] != slice.last()[0] || slice[0][1] != slice.last()[1])) {
-                slice.add(slice[0])
+            //TODO("investigate why and what a correct behaviour would be")
+            if (ring.isNotEmpty()) {
+                val a = ring.last()
+                if (a[axis] in k1..k2) slice.add(a)
+                if (slice.isNotEmpty() && (slice[0][0] != slice.last()[0] || slice[0][1] != slice.last()[1])) {
+                    slice.add(slice[0])
+                }
+                polygon.add(slice)
             }
-            polygon.add(slice)
         }
 
         return polygon
