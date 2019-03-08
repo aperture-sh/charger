@@ -5,6 +5,8 @@ import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonTreeMapper
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.GeometryFactory
 
 /**
  * Type are a MUST string member of `Geometry` Objects
@@ -54,6 +56,50 @@ sealed class Geometry {
      */
     @Serializable
     data class MultiPolygon(val type: GeometryType = GeometryType.MultiPolygon, val coordinates: List<List<List<List<Double>>>>) : Geometry()
+
+    /**
+     * Converts the tank geometry model to JTS
+     * @return a JTS geometry for better library integration
+     */
+    fun toJTS() : org.locationtech.jts.geom.Geometry {
+        val gf = GeometryFactory()
+        return when(this) {
+            is Point -> gf.createPoint(Coordinate(this.coordinates[0], this.coordinates[1]))
+            is MultiPoint -> gf.createMultiPoint(
+                    this.coordinates.map {
+                        gf.createPoint(Coordinate(it[0], it[1]))
+                    }.toTypedArray()
+            )
+            is LineString -> gf.createLineString(this.coordinates.map { Coordinate(it[0], it[1]) }.toTypedArray())
+            is MultiLineString -> gf.createMultiLineString(
+                    this.coordinates.map { line ->
+                        gf.createLineString(line.map { Coordinate(it[0], it[1]) }.toTypedArray())
+                    }.toTypedArray()
+            )
+            is Polygon -> gf.createPolygon(
+                    gf.createLinearRing(this.coordinates[0].map { Coordinate(it[0], it[1]) }.toTypedArray()),
+                    this.coordinates.subList(1, this.coordinates.size).map { hole ->
+                        gf.createLinearRing(hole.map { Coordinate(it[0], it[1]) }.toTypedArray())
+                    }.toTypedArray()
+            )
+            is MultiPolygon -> gf.createMultiPolygon(
+                    this.coordinates.map { polygon ->
+                        gf.createPolygon(
+                                gf.createLinearRing(polygon[0].map { Coordinate(it[0], it[1]) }.toTypedArray()),
+                                polygon.subList(1, polygon.size).map { hole ->
+                                    gf.createLinearRing(hole.map { Coordinate(it[0], it[1]) }.toTypedArray())
+                                }.toTypedArray()
+                        )
+                    }.toTypedArray()
+            )
+        }
+    }
+
+    /**
+     * Converts the tank geometry model to Well-Known-Text (WKT)
+     * @return Well-Known-Text (WKT)
+     */
+    fun toWKT() = toJTS().toText()
 
 }
 

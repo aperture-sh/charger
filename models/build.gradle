@@ -34,6 +34,7 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.9.1"
+    compile group: 'org.locationtech.jts', name: 'jts-core', version: '1.16.1'
 
     compile 'com.google.protobuf:protobuf-java:3.0.0'
 
