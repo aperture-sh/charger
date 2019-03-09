@@ -106,22 +106,41 @@ sealed class Geometry {
         /**
          * Reads a JTS Geomtery and converts it into a superchagred geometry object
          * @param g A [org.locationtech.jts.geom.Geometry] to convert
-         * @return A supercharged geometry object
+         * @return A supercharged geometry object or null when unknown type
          */
         @JvmStatic
         fun fromJTS(g: org.locationtech.jts.geom.Geometry) =
             when (g) {
                 is org.locationtech.jts.geom.Point -> Point(coordinates = listOf(g.x, g.y))
+                is org.locationtech.jts.geom.MultiPoint -> {
+                    MultiPoint(coordinates =
+                        (0 until g.numPoints).map { i -> (g.getGeometryN(i) as org.locationtech.jts.geom.Point).let { listOf(it.x, it.y)} }
+                    )
+                }
                 is org.locationtech.jts.geom.LineString -> {
                     LineString(coordinates = g.coordinateSequence.toCoordinateArray().map { listOf(it.x, it.y) })
+                }
+                is org.locationtech.jts.geom.MultiLineString -> {
+                    MultiLineString(coordinates =
+                        (0 until g.numGeometries).map { i -> g.getGeometryN(i).coordinates.map { listOf(it.x, it.y) } }
+                    )
                 }
                 is org.locationtech.jts.geom.Polygon -> {
                     Polygon(coordinates =
                         listOf(g.exteriorRing.coordinateSequence.toCoordinateArray().map { listOf(it.x, it.y) }) +
-                                (0 until g.numInteriorRing).map { g.getInteriorRingN(it).coordinateSequence.toCoordinateArray().map { listOf(it.x, it.y) } }
+                                (0 until g.numInteriorRing).map { i -> g.getInteriorRingN(i).coordinateSequence.toCoordinateArray().map { listOf(it.x, it.y) } }
                     )
                 }
-                else -> TODO("Not Implemented")
+                is org.locationtech.jts.geom.MultiPolygon -> {
+                    MultiPolygon(coordinates =
+                        (0 until g.numGeometries).map {  i ->
+                            val polygon = (g.getGeometryN(i) as org.locationtech.jts.geom.Polygon)
+                            listOf(polygon.exteriorRing.coordinateSequence.toCoordinateArray().map { listOf(it.x, it.y) }) +
+                                    (0 until polygon.numInteriorRing).map { j -> polygon.getInteriorRingN(j).coordinateSequence.toCoordinateArray().map { listOf(it.x, it.y) } }
+                        }
+                    )
+                }
+                else -> null
             }
 
         /**
