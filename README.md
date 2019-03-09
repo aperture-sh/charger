@@ -1,8 +1,8 @@
-# A Marauder Collection of Vector Tile Tools
+# A marauder's Supercharged Collection of Vector Tile Tools
 
 The collection consists of following supercharged components
-* Clipper
-* Encoder
-* Models
-* Projector
-* Utils
+* [Clipper](clipper/README.md)
+* [Encoder](encoder/README.md)
+* [Models](models/README.md)
+* [Projector](projector/README.md)
+* [Utils](utils/README.md)
