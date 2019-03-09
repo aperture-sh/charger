@@ -5,8 +5,8 @@ import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonTreeMapper
-import org.locationtech.jts.geom.Coordinate
-import org.locationtech.jts.geom.GeometryFactory
+import org.locationtech.jts.geom.*
+import org.locationtech.jts.io.WKTReader
 
 /**
  * Type are a MUST string member of `Geometry` Objects
@@ -58,7 +58,7 @@ sealed class Geometry {
     data class MultiPolygon(val type: GeometryType = GeometryType.MultiPolygon, val coordinates: List<List<List<List<Double>>>>) : Geometry()
 
     /**
-     * Converts the tank geometry model to JTS
+     * Converts the supercharged geometry object to JTS
      * @return a JTS geometry for better library integration
      */
     fun toJTS() : org.locationtech.jts.geom.Geometry {
@@ -96,10 +96,42 @@ sealed class Geometry {
     }
 
     /**
-     * Converts the tank geometry model to Well-Known-Text (WKT)
+     * Converts the supercharged geometry object to Well-Known-Text (WKT)
      * @return Well-Known-Text (WKT)
      */
     fun toWKT() = toJTS().toText()
+
+    companion object {
+
+        /**
+         * Reads a JTS Geomtery and converts it into a superchagred geometry object
+         * @param g A [org.locationtech.jts.geom.Geometry] to convert
+         * @return A supercharged geometry object
+         */
+        @JvmStatic
+        fun fromJTS(g: org.locationtech.jts.geom.Geometry) =
+            when (g) {
+                is org.locationtech.jts.geom.Point -> Point(coordinates = listOf(g.x, g.y))
+                is org.locationtech.jts.geom.LineString -> {
+                    LineString(coordinates = g.coordinateSequence.toCoordinateArray().map { listOf(it.x, it.y) })
+                }
+                is org.locationtech.jts.geom.Polygon -> {
+                    Polygon(coordinates =
+                        listOf(g.exteriorRing.coordinateSequence.toCoordinateArray().map { listOf(it.x, it.y) }) +
+                                (0 until g.numInteriorRing).map { g.getInteriorRingN(it).coordinateSequence.toCoordinateArray().map { listOf(it.x, it.y) } }
+                    )
+                }
+                else -> TODO("Not Implemented")
+            }
+
+        /**
+         * Reads a Well-Known-Text (WKT) geometry and converts it to a supercharged geometry object
+         * @param wkt WKT string
+         * @return  A supercharged geometry object
+         */
+        @JvmStatic
+        fun fromWKT(wkt: String) = fromJTS(WKTReader().read(wkt))
+    }
 
 }
 
