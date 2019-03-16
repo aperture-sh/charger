@@ -212,4 +212,21 @@ class Projector(val extend: Int = 4096) {
      * Calculate latitude for top left tile corner
      */
     fun tileToLat(y: Int, z: Int) = Math.toDegrees(Math.atan(Math.sinh(Math.PI - (2.0 * Math.PI * y.toDouble()) / Math.pow(2.0, z.toDouble()))))
+
+    /**
+     * Find tile number to given WGS84 coordinate and zoom level
+     */
+    fun getTileNumber(lat: Double, lon: Double, zoom: Int): Triple<Int, Int, Int> {
+        var xtile = Math.floor((lon + 180) / 360 * (1 shl zoom)).toInt()
+        var ytile = Math.floor((1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1 shl zoom)).toInt()
+        if (xtile < 0)
+            xtile = 0
+        if (xtile >= 1 shl zoom)
+            xtile = (1 shl zoom) - 1
+        if (ytile < 0)
+            ytile = 0
+        if (ytile >= 1 shl zoom)
+            ytile = (1 shl zoom) - 1
+        return Triple(zoom, xtile, ytile)
+    }
 }
