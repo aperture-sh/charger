@@ -1,5 +1,7 @@
 # Supercharger
 
+[![Apache License, Version 2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+
 ## A marauder's supercharged collection of Vector Tile Tools
 
 The [Encoder](#encoder) is the main module to work with vector tiles.
