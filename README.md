@@ -2,7 +2,7 @@
 
 ## A marauder's supercharged collection of Vector Tile Tools
 
-The [Encoder](encoder) is the main module to work with vector tiles.
+The [Encoder](#encoder) is the main module to work with vector tiles.
 When talking about vector tiles, it refers to a standard developed by MapBox (https://github.com/mapbox/vector-tile-spec).
 
 The collection consists of following supercharged components:
@@ -25,32 +25,14 @@ A Encoder and Decoder for Mapbox Vector Tiles. We implement the specification ve
    * Directly from two BLOBs
    * By injecting one tile in another's encoding function call
 * Runs without JTS or GeoTools dependencies
+   * Also JTS Geometry support is implemented
 * Allows to merge tiles without completely decoding them
 
 ## Usage
 
 ### Gradle
 
-Add our artifactory repository. Keep in mind to set the credentials either in the `gradle.properties` file or as environment variables.
-```groovy
-repositories {
-    jcenter()
-    maven {
-        url = rootProject.hasProperty("art_url") ? "$art_url" : "$System.env.artifactory_contextUrl"
-        credentials {
-            username = rootProject.hasProperty("art_username") ? "$art_username" : "$System.env.artifactory_user"
-            password = rootProject.hasProperty("art_password") ? "$art_password" : "$System.env.artifactory_password"
-        }
-    }
-
-}
-```
-`gradle.properties` file exeample:
-```
-art_username=
-art_password=
-art_url=https://geocode.igd.fraunhofer.de:8081/artifactory/libs-snapshot
-```
+Artifacts are published on OSS Sonatype and Maven Central.
 
 Gradle dependency:
 ```groovy
@@ -90,7 +72,7 @@ val features: List<Feature> = encoder.decode(bytes)
 
 * Only one layer per tile supported, decoder reads only layer 0
 
-## Hints
+### Hints
 
 * As intended our Encoder/Decoder does no coordinate transformation and clipping
 
@@ -133,3 +115,4 @@ projector.transformGeometry(...)
 
 # Geometry Utils
 
+Util functions for geometry intersection testing and geometry simplifications.
