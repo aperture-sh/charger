@@ -38,11 +38,11 @@ Artifacts are published on OSS Sonatype and Maven Central.
 
 Gradle dependency:
 ```groovy
-compile group: 'io.marauder.supercharger', name: 'encoder', version: '0.0.3-SNAPSHOT'
-compile group: 'io.marauder.supercharger', name: 'models', version: '0.0.3-SNAPSHOT'
-compile group: 'io.marauder.supercharger', name: 'projector', version: '0.0.3-SNAPSHOT'
-compile group: 'io.marauder.supercharger', name: 'utils', version: '0.0.3-SNAPSHOT'
-compile group: 'io.marauder.supercharger', name: 'clipper', version: '0.0.3-SNAPSHOT'
+compile group: 'io.marauder.supercharger', name: 'encoder', version: '0.0.3'
+compile group: 'io.marauder.supercharger', name: 'models', version: '0.0.3'
+compile group: 'io.marauder.supercharger', name: 'projector', version: '0.0.3'
+compile group: 'io.marauder.supercharger', name: 'utils', version: '0.0.3'
+compile group: 'io.marauder.supercharger', name: 'clipper', version: '0.0.3'
 ```
 
 For snapshots use this repository:
