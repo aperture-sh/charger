@@ -45,6 +45,11 @@ compile group: 'io.marauder.supercharger', name: 'utils', version: '0.0.3-SNAPSH
 compile group: 'io.marauder.supercharger', name: 'clipper', version: '0.0.3-SNAPSHOT'
 ```
 
+For snapshots use this repository:
+```groovy
+maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+```
+
 ### Encoding Example
 
 ```kotlin
