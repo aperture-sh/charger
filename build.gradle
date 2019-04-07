@@ -15,6 +15,8 @@ buildscript {
 }
 
 subprojects {
+    apply plugin: 'signing'
+
     version = '0.0.3'
     group = 'io.marauder.supercharger'
 
@@ -56,8 +58,16 @@ subprojects {
     }
 
     plugins.withType(MavenPlugin) {
+        // sign all artifacts
+        signing {
+            required { !version.endsWith('SNAPSHOT') && gradle.taskGraph.hasTask(':uploadArchives') }
+            sign configurations.archives
+        }
 
         uploadArchives.repositories.mavenDeployer {
+            // sign artifacts before upload
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
             // upload to geocode artifactory
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
                 authentication(userName: rootProject.hasProperty('ossrhUsername') ? "$ossrhUsername" : "$System.env.ossrhUsername",
@@ -75,7 +85,7 @@ subprojects {
             pom.project {
                 name 'supercharger'
                 packaging 'jar'
-                description 'A Collection of Vector Tile Tools including the supercharged Encoder!'
+                description 'Supercharger is a Collection of Vector Tile Tools including the supercharged encoder!'
                 url 'http://marauder.io/supercharger'
 
                 scm {
