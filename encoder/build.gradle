@@ -14,13 +14,6 @@ protobuf {
     }
 }
 
-dokka {
-    outputFormat = 'html'
-    outputDirectory = "$buildDir/javadoc"
-}
-
-javadoc.dependsOn(dokka)
-
 sourceSets {
     main.kotlin.srcDirs = main.java.srcDirs = ['src/main/kotlin']
     test.kotlin.srcDirs = test.java.srcDirs = ['src/test/kotlin']
