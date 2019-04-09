@@ -54,7 +54,32 @@ class Clipper(private val calcBoundingBoxes: Boolean = false) {
      * @param k4 high vertical boundary
      * @return Clipped Feature
      */
-    fun clipFeature(f: Feature, k1: Double, k2: Double, k3: Double, k4: Double) = when (f.geometry) {
+    fun clip(f: Feature, scale: Double, k1: Double, k2: Double, k3: Double, k4: Double, checkBoundingBox: Boolean = true) : Feature? {
+        val scaleK1 = k1 / scale
+        val scaleK2 = k2 / scale
+        val scaleK3 = k3 / scale
+        val scaleK4 = k4 / scale
+        val minX = f.bbox[0]
+        val maxX = f.bbox[2 + 0]
+        val minY = f.bbox[1]
+        val maxY = f.bbox[2 + 1]
+
+        if (checkBoundingBox && (minX >= scaleK2 || maxX <= scaleK1 || minY >= scaleK4 || maxY <= scaleK3)) {
+            return null
+        }
+        return clipFeature(f, scaleK1, scaleK2, scaleK3, scaleK4).firstOrNull()
+    }
+
+    /**
+     * Clip a feature at given boundaries
+     * @param f Feature to clip
+     * @param k1 low horizontal boundary
+     * @param k2 high horizontal boundary
+     * @param k3 low vertical boundary
+     * @param k4 high vertical boundary
+     * @return Clipped Feature
+     */
+    private fun clipFeature(f: Feature, k1: Double, k2: Double, k3: Double, k4: Double) = when (f.geometry) {
         is Geometry.Point -> listOf(Feature(
                 geometry = Geometry.Point(coordinates = filterPoints(listOf((f.geometry as Geometry.Point).coordinates), k1, k2, k3, k4).firstOrNull() ?: emptyList()),
                 properties = f.properties
