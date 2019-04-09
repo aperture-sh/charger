@@ -26,6 +26,12 @@ dependencies {
 
 }
 
+uploadArchives.repositories.mavenDeployer {
+    pom.project {
+        description 'Functions for applying geospatial transformations and projections'
+    }
+}
+
 test {
     useJUnitPlatform()
 }

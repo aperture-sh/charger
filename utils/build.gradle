@@ -26,6 +26,12 @@ dependencies {
 
 }
 
+uploadArchives.repositories.mavenDeployer {
+    pom.project {
+        description 'Marauder util functions'
+    }
+}
+
 test {
     useJUnitPlatform()
 }

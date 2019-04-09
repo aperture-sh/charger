@@ -26,6 +26,12 @@ dependencies {
 
 }
 
+uploadArchives.repositories.mavenDeployer {
+    pom.project {
+        description 'Functions to do geospatial clipping of geometries'
+    }
+}
+
 test {
     useJUnitPlatform()
 }

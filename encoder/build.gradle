@@ -40,6 +40,12 @@ dependencies {
     testCompile("org.assertj:assertj-core:3.11.1")
 }
 
+uploadArchives.repositories.mavenDeployer {
+    pom.project {
+        description 'Flexible encoder, decoder and merger for Vector Tiles'
+    }
+}
+
 clean {
     delete protobuf.generatedFilesBaseDir
 }

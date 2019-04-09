@@ -37,6 +37,12 @@ dependencies {
     testCompile("org.assertj:assertj-core:3.11.1")
 }
 
+uploadArchives.repositories.mavenDeployer {
+    pom.project {
+        description 'Lightweight geospatial models with JTS/WKT export and import'
+    }
+}
+
 clean {
     delete protobuf.generatedFilesBaseDir
 }

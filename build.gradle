@@ -107,7 +107,7 @@ subprojects {
             pom.project {
                 name 'supercharger'
                 packaging 'jar'
-                description 'Supercharger is a Collection of Vector Tile Tools including the supercharged encoder!'
+                description 'Supercharger is a Collection of Vector Tile Tools including the Supercharged Encoder!'
                 url 'http://marauder.io/supercharger'
 
                 scm {
