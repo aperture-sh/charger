@@ -41,45 +41,53 @@ class Clipper(private val calcBoundingBoxes: Boolean = false) {
             val maxY = f.bbox[2 + 1]
         // condition for trivia reject
             !(minX > scaleK2 || maxX < scaleK1 || minY > scaleK4 || maxY < scaleK3) || !checkBoundingBox
-        }.flatMap { f ->
-            when (f.geometry) {
-                is Geometry.Point -> listOf(Feature(
-                        geometry = Geometry.Point(coordinates = filterPoints(listOf((f.geometry as Geometry.Point).coordinates), scaleK1, scaleK2, scaleK3, scaleK4).firstOrNull() ?: emptyList()),
-                        properties = f.properties
-                ))
-                is Geometry.MultiPoint -> listOf(Feature(
-                        geometry = Geometry.MultiPoint(coordinates = filterPoints((f.geometry as Geometry.MultiPoint).coordinates, scaleK1, scaleK2, scaleK3, scaleK4)),
-                        properties = f.properties
-                ))
-                is Geometry.LineString -> {
-                    listOf(Feature(geometry = Geometry.LineString(
-                            coordinates = clipLine(clipLine(listOf((f.geometry as Geometry.LineString).coordinates), scaleK1, scaleK2, 0), scaleK3, scaleK4, 1).firstOrNull() ?: emptyList()),
-                            properties = f.properties)
-                    )
-                }
-                is Geometry.MultiLineString -> {
-                    listOf(Feature(geometry = Geometry.MultiLineString(
-                            coordinates = clipLine(clipLine((f.geometry as Geometry.MultiLineString).coordinates, scaleK1, scaleK2, 0), scaleK3, scaleK4, 1)
-                    )))
-                }
-                is Geometry.Polygon -> {
-                    listOf(Feature(geometry = Geometry.Polygon(
-                            coordinates = clipPolygon(clipPolygon((f.geometry as Geometry.Polygon).coordinates, scaleK1, scaleK2, 0), scaleK3, scaleK4, 1)),
-                            properties = f.properties)
-                    )
-                }
-                is Geometry.MultiPolygon -> {
-                    listOf(Feature(geometry = Geometry.MultiPolygon(
-                            coordinates = (f.geometry as Geometry.MultiPolygon).coordinates.map {
-                                clipPolygon(clipPolygon(it, scaleK1, scaleK2, 0), scaleK3, scaleK4, 1)
-                            }
-                    )))
-                }
-                else -> listOf(f)
-            }
-
-        }
+        }.flatMap { f -> clipFeature(f, scaleK1, scaleK2, scaleK3, scaleK4) }
         )
+    }
+
+    /**
+     * Clip a feature at given boundaries and a scaling factor
+     * @param f Feature to clip
+     * @param k1 low horizontal boundary
+     * @param k2 high horizontal boundary
+     * @param k3 low vertical boundary
+     * @param k4 high vertical boundary
+     * @return Clipped Feature
+     */
+    fun clipFeature(f: Feature, k1: Double, k2: Double, k3: Double, k4: Double) = when (f.geometry) {
+        is Geometry.Point -> listOf(Feature(
+                geometry = Geometry.Point(coordinates = filterPoints(listOf((f.geometry as Geometry.Point).coordinates), k1, k2, k3, k4).firstOrNull() ?: emptyList()),
+                properties = f.properties
+        ))
+        is Geometry.MultiPoint -> listOf(Feature(
+                geometry = Geometry.MultiPoint(coordinates = filterPoints((f.geometry as Geometry.MultiPoint).coordinates, k1, k2, k3, k4)),
+                properties = f.properties
+        ))
+        is Geometry.LineString -> {
+            listOf(Feature(geometry = Geometry.LineString(
+                    coordinates = clipLine(clipLine(listOf((f.geometry as Geometry.LineString).coordinates), k1, k2, 0), k3, k4, 1).firstOrNull() ?: emptyList()),
+                    properties = f.properties)
+            )
+        }
+        is Geometry.MultiLineString -> {
+            listOf(Feature(geometry = Geometry.MultiLineString(
+                    coordinates = clipLine(clipLine((f.geometry as Geometry.MultiLineString).coordinates, k1, k2, 0), k3, k4, 1)
+            )))
+        }
+        is Geometry.Polygon -> {
+            listOf(Feature(geometry = Geometry.Polygon(
+                    coordinates = clipPolygon(clipPolygon((f.geometry as Geometry.Polygon).coordinates, k1, k2, 0), k3, k4, 1)),
+                    properties = f.properties)
+            )
+        }
+        is Geometry.MultiPolygon -> {
+            listOf(Feature(geometry = Geometry.MultiPolygon(
+                    coordinates = (f.geometry as Geometry.MultiPolygon).coordinates.map {
+                        clipPolygon(clipPolygon(it, k1, k2, 0), k3, k4, 1)
+                    }
+            )))
+        }
+        else -> listOf(f)
     }
 
     private fun filterPoints(coordinates: List<List<Double>>, scaleK1: Double, scaleK2: Double, scaleK3: Double, scaleK4: Double) =
