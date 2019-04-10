@@ -230,41 +230,49 @@ class Encoder(private val extend: Int = 4096) {
      */
     fun merge(t1: VectorTile.Tile, t2: VectorTile.Tile) : VectorTile.Tile {
         val tile = t1.toBuilder()
-        val layer1 = t1.getLayers(0).toBuilder()
-        val layer2 = t2.getLayers(0)
+        t1.layersList.forEach { layer ->
+            val mergeLayer = findLayer(t2, layer.name)
+            if (mergeLayer < 0) {
+                tile.addLayers(layer)
+            } else {
+                val layer1 = layer.toBuilder()
+                val layer2 = t2.getLayers(mergeLayer)
 
-        val keySet = (layer1.keysList + layer2.keysList).toHashSet()
-        val keyList = keySet.mapIndexed { i, s -> s to i }.toMap()
-        val valueSet = (layer1.valuesList + layer2.valuesList).toHashSet()
-        val valueList = valueSet.mapIndexed { i, s -> s to i }.toMap()
+                val keySet = (layer1.keysList + layer2.keysList).toHashSet()
+                val keyList = keySet.mapIndexed { i, s -> s to i }.toMap()
+                val valueSet = (layer1.valuesList + layer2.valuesList).toHashSet()
+                val valueList = valueSet.mapIndexed { i, s -> s to i }.toMap()
 
-        val features1 = layer2.featuresList.map { f ->
-            val builder = f.toBuilder()
-            val tagSet = builder.tagsList.chunked(2).map { attr ->
-                keyList[layer2.getKeys(attr[0])] to valueList[layer2.getValues(attr[1])]
-            }.fold(listOf<Int>()) { l, tagEntry ->  l + listOf(tagEntry.first ?: -1, tagEntry.second ?: -1) }
-            builder.clearTags()
-            builder.addAllTags(tagSet)
-            builder.build()
+                val features1 = layer2.featuresList.map { f ->
+                    val builder = f.toBuilder()
+                    val tagSet = builder.tagsList.chunked(2).map { attr ->
+                        keyList[layer2.getKeys(attr[0])] to valueList[layer2.getValues(attr[1])]
+                    }.fold(listOf<Int>()) { l, tagEntry ->  l + listOf(tagEntry.first ?: -1, tagEntry.second ?: -1) }
+                    builder.clearTags()
+                    builder.addAllTags(tagSet)
+                    builder.build()
+                }
+
+                val features = layer1.featuresList.map { f ->
+                    val builder = f.toBuilder()
+                    val tagSet = builder.tagsList.chunked(2).map { attr ->
+                        keyList[layer1.getKeys(attr[0])] to valueList[layer1.getValues(attr[1])]
+                    }.fold(listOf<Int>()) { l, tagEntry ->  l + listOf(tagEntry.first ?: -1, tagEntry.second ?: -1) }
+                    builder.clearTags()
+                    builder.addAllTags(tagSet)
+                    builder.build()
+                } + features1
+
+                layer1.clearKeys()
+                layer1.addAllKeys(keySet)
+                layer1.clearValues()
+                layer1.addAllValues(valueSet)
+
+                layer1.clearFeatures()
+                tile.setLayers(mergeLayer, layer1.addAllFeatures(features).build())
+            }
         }
 
-        val features = layer1.featuresList.map { f ->
-            val builder = f.toBuilder()
-            val tagSet = builder.tagsList.chunked(2).map { attr ->
-                keyList[layer1.getKeys(attr[0])] to valueList[layer1.getValues(attr[1])]
-            }.fold(listOf<Int>()) { l, tagEntry ->  l + listOf(tagEntry.first ?: -1, tagEntry.second ?: -1) }
-            builder.clearTags()
-            builder.addAllTags(tagSet)
-            builder.build()
-        } + features1
-
-        layer1.clearKeys()
-        layer1.addAllKeys(keySet)
-        layer1.clearValues()
-        layer1.addAllValues(valueSet)
-
-        layer1.clearFeatures()
-        tile.setLayers(0, layer1.addAllFeatures(features).build())
         return tile.build()
     }
 
@@ -493,5 +501,12 @@ class Encoder(private val extend: Int = 4096) {
         ring.subList(1, ring.lastIndex+1).foldIndexed(0) { i, sum, p ->
             sum + (p[0]-ring[i][0])*(p[1]+ring[i][1])
         } < 0
+
+    private fun findLayer(t: VectorTile.Tile, layer: String) : Int {
+        t.layersList.forEachIndexed { i, l ->
+            if (l.name == layer) return i
+        }
+        return -1
+    }
 
 }
