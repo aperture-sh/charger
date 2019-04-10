@@ -65,4 +65,11 @@ class ClipperTest {
             assertThat((f.geometry as Geometry.Polygon).coordinates[0][3][1]).isEqualTo(1400.0)
         }
     }
+
+    @Test
+    fun clipOutsidePloygon() {
+        val g = Geometry.Polygon(coordinates = listOf(listOf(listOf(0.0,0.0),listOf(0.0,0.0),listOf(0.0,0.0),listOf(0.0,0.0),listOf(0.0,0.0))))
+        val f = clipper.clip(Feature(geometry = g), 1.0, 1.0, 2.0, 1.0, 2.0, false)
+        assertThat(f).isNull()
+    }
 }
