@@ -81,7 +81,7 @@ val features: List<Feature> = encoder.decode(bytes)
 
 ### Current Limitations
 
-* Only one layer per tile supported, decoder reads only layer 0
+* Multiple layers are supported, but merging by injecting features into the encoding process does support only one layer.
 
 ### Hints
 
