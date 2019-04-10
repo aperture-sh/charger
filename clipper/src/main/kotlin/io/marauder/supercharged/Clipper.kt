@@ -100,17 +100,18 @@ class Clipper(private val calcBoundingBoxes: Boolean = false) {
             )))
         }
         is Geometry.Polygon -> {
-            listOf(Feature(geometry = Geometry.Polygon(
+            val newFeature = Feature(geometry = Geometry.Polygon(
                     coordinates = clipPolygon(clipPolygon((f.geometry as Geometry.Polygon).coordinates, k1, k2, 0), k3, k4, 1)),
                     properties = f.properties)
-            )
+            if ((newFeature.geometry as Geometry.Polygon).coordinates.isEmpty()) emptyList() else listOf(newFeature)
         }
         is Geometry.MultiPolygon -> {
-            listOf(Feature(geometry = Geometry.MultiPolygon(
+            val newFeature = Feature(geometry = Geometry.MultiPolygon(
                     coordinates = (f.geometry as Geometry.MultiPolygon).coordinates.map {
                         clipPolygon(clipPolygon(it, k1, k2, 0), k3, k4, 1)
                     }
-            )))
+            ))
+            if ((newFeature.geometry as Geometry.MultiPolygon).coordinates.isEmpty()) emptyList() else listOf(newFeature)
         }
         else -> listOf(f)
     }
