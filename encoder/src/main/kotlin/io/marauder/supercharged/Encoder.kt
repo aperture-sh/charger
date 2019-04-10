@@ -230,6 +230,7 @@ class Encoder(private val extend: Int = 4096) {
      */
     fun merge(t1: VectorTile.Tile, t2: VectorTile.Tile) : VectorTile.Tile {
         val tile = t1.toBuilder()
+        val mergedLayers = mutableListOf<Int>()
         t1.layersList.forEach { layer ->
             val mergeLayer = findLayer(t2, layer.name)
             if (mergeLayer < 0) {
@@ -237,6 +238,7 @@ class Encoder(private val extend: Int = 4096) {
             } else {
                 val layer1 = layer.toBuilder()
                 val layer2 = t2.getLayers(mergeLayer)
+                mergedLayers.add(mergeLayer)
 
                 val keySet = (layer1.keysList + layer2.keysList).toHashSet()
                 val keyList = keySet.mapIndexed { i, s -> s to i }.toMap()
@@ -271,6 +273,9 @@ class Encoder(private val extend: Int = 4096) {
                 layer1.clearFeatures()
                 tile.setLayers(mergeLayer, layer1.addAllFeatures(features).build())
             }
+        }
+        t2.layersList.forEachIndexed { i, layer ->
+            if (!mergedLayers.contains(i)) tile.addLayers(layer)
         }
 
         return tile.build()
