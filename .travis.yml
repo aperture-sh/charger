@@ -6,7 +6,7 @@ jdk:
   - oraclejdk8
 before_install:
   - chmod -R ug+x .travis
-  - .travis/install.sh
+  - if [ "$TRAVIS_REPO_SLUG" == "marauder-io/supercharger" ]; then .travis/install.sh; fi
 script:
   - ./gradlew check &&
     if [ "$TRAVIS_REPO_SLUG" == "marauder-io/supercharger" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
