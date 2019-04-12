@@ -7,6 +7,8 @@
 The [Encoder](#encoder) is the main module to work with vector tiles.
 When talking about vector tiles, it refers to a standard developed by MapBox (https://github.com/mapbox/vector-tile-spec).
 
+Detailed documentation of the Marauder components coming soon on our webpage [https://marauder.io](https://marauder.io).
+
 The collection consists of following supercharged components:
 * [Encoder](#encoder)
 * [Clipper](#geometry-clipper)
