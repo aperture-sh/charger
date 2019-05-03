@@ -4,4 +4,4 @@ include 'models'
 include 'projector'
 include 'utils'
 
-rootProject.name = 'supercharger'
+rootProject.name = 'charger'

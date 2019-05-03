@@ -1,4 +1,4 @@
-package io.marauder.supercharged
+package io.marauder.charged
 
 class Simplifier {
     fun simplify(points: List<List<Double>>, sqTolerance: Double) : List<List<Double>> {

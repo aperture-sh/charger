@@ -1,6 +1,6 @@
-package io.marauder.supercharged
+package io.marauder.charged
 
-import io.marauder.supercharged.models.*
+import io.marauder.charged.models.*
 
 /**
  * Projector provides vector tile specific projection and transformation functions

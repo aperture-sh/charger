@@ -1,4 +1,4 @@
-package io.marauder.supercharged.models
+package io.marauder.charged.models
 
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.SerialClassDescImpl

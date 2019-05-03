@@ -1,6 +1,6 @@
-package io.marauder.supercharged
+package io.marauder.charged
 
-import io.marauder.supercharged.models.GeoJSON
+import io.marauder.charged.models.GeoJSON
 
 /**
  * Intersector Helper Functions

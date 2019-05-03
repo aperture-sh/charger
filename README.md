@@ -1,15 +1,15 @@
-# Supercharger
+# Charger
 
 [![Apache License, Version 2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0) [![Build Status](https://travis-ci.org/marauder-io/supercharger.svg?branch=master)](https://travis-ci.org/marauder-io/supercharger)
 
-## A marauder's supercharged collection of Vector Tile Tools
+## A marauder's charged collection of Vector Tile Tools
 
 The [Encoder](#encoder) is the main module to work with vector tiles.
 When talking about vector tiles, it refers to a standard developed by MapBox (https://github.com/mapbox/vector-tile-spec).
 
 Detailed documentation of the Marauder components coming soon on our webpage [https://marauder.io](https://marauder.io).
 
-The collection consists of following supercharged components:
+The collection consists of following charged components:
 * [Encoder](#encoder)
 * [Clipper](#geometry-clipper)
 * [Models](#geometry-models)
