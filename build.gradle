@@ -18,8 +18,8 @@ subprojects {
     apply plugin: 'signing'
     apply plugin: 'org.jetbrains.dokka'
 
-    version = '0.1.0-SNAPSHOT'
-    group = 'io.marauder.supercharger'
+    version = '1.0.0-SNAPSHOT'
+    group = 'io.marauder.charger'
 
     plugins.withType(JavaPlugin) {
         sourceCompatibility = '1.8'
@@ -70,7 +70,7 @@ subprojects {
         gradle.taskGraph.whenReady { taskGraph ->
             if (taskGraph.allTasks.any { it instanceof Sign }) {
                 allprojects { ext."signing.keyId" = System.getenv('GPG_KEY_ID') }
-                allprojects { ext."signing.secretKeyRingFile" = System.getenv('HOME') + "/build/marauder-io/supercharger/" + System.getenv('GPG_KEY_LOCATION') }
+                allprojects { ext."signing.secretKeyRingFile" = System.getenv('HOME') + "/build/marauder-io/charger/" + System.getenv('GPG_KEY_LOCATION') }
                 allprojects { ext."signing.password" = System.getenv('GPG_PASSPHRASE') }
             }
             // Do not sign archives by default (a local build without gpg keyring should succeed)
@@ -105,15 +105,15 @@ subprojects {
 
             // pom file details
             pom.project {
-                name 'supercharger'
+                name 'charger'
                 packaging 'jar'
-                description 'Supercharger is a Collection of Vector Tile Tools including the Supercharged Encoder!'
+                description 'The Charger is a Collection of Vector Tile Tools including the Supercharged Encoder!'
                 url 'http://marauder.io/supercharger'
 
                 scm {
-                    url 'scm:git:git://https://github.com/marauder-io/supercharger.git'
-                    connection 'scm:git:git://https://github.com/marauder-io/supercharger.git'
-                    developerConnection 'scm:git:git://https://github.com/marauder-io/supercharger.git'
+                    url 'scm:git:git://https://github.com/marauder-io/charger.git'
+                    connection 'scm:git:git://https://github.com/marauder-io/charger.git'
+                    developerConnection 'scm:git:git://https://github.com/marauder-io/charger.git'
                 }
 
                 licenses {

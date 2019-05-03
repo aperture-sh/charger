@@ -1,5 +1,5 @@
-import io.marauder.supercharged.Encoder
-import io.marauder.supercharged.models.*
+import io.marauder.charged.Encoder
+import io.marauder.charged.models.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.JSON
 import java.io.File

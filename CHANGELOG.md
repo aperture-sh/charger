@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## Current Snapshot
 
+* Renaming to `charger` and `charged` namespace
 * Split encoder and models into separate modules
 * Bug fixes
 

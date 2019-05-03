@@ -1,7 +1,7 @@
-import io.marauder.supercharged.Encoder
-import io.marauder.supercharged.models.Feature
-import io.marauder.supercharged.models.GeoJSON
-import io.marauder.supercharged.models.Value
+import io.marauder.charged.Encoder
+import io.marauder.charged.models.Feature
+import io.marauder.charged.models.GeoJSON
+import io.marauder.charged.models.Value
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.parse

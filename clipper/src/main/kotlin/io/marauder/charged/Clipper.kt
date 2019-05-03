@@ -1,8 +1,8 @@
-package io.marauder.supercharged
+package io.marauder.charged
 
-import io.marauder.supercharged.models.Feature
-import io.marauder.supercharged.models.GeoJSON
-import io.marauder.supercharged.models.Geometry
+import io.marauder.charged.models.Feature
+import io.marauder.charged.models.GeoJSON
+import io.marauder.charged.models.Geometry
 
 /**
  * The clipper provides functions to clip generic geometries and given boundaries
