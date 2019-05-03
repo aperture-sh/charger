@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## Current Snapshot
 
+* Travis Badge Fix
+
+## [1.0.1] - 2019-05-03
+
 * Renaming to `charger` and `charged` namespace
 * Split encoder and models into separate modules
 * Bug fixes
