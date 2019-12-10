@@ -48,7 +48,8 @@ class Projector(val extend: Int = 4096) {
         }
         return Feature (
                 properties = f.properties,
-                geometry = geometry
+                geometry = geometry,
+                id = f.id
         )
     }
 
