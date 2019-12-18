@@ -70,7 +70,7 @@ subprojects {
         gradle.taskGraph.whenReady { taskGraph ->
             if (taskGraph.allTasks.any { it instanceof Sign }) {
                 allprojects { ext."signing.keyId" = System.getenv('GPG_KEY_ID') }
-                allprojects { ext."signing.secretKeyRingFile" = System.getenv('HOME') + "/build/marauder-io/charger/" + System.getenv('GPG_KEY_LOCATION') }
+                allprojects { ext."signing.secretKeyRingFile" = System.getenv('HOME') + "/build/aperture-sh/charger/" + System.getenv('GPG_KEY_LOCATION') }
                 allprojects { ext."signing.password" = System.getenv('GPG_PASSPHRASE') }
             }
             // Do not sign archives by default (a local build without gpg keyring should succeed)
