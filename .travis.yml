@@ -7,10 +7,10 @@ jdk:
   - oraclejdk8
 before_install:
   - chmod -R ug+x .travis
-  - if [ "$TRAVIS_REPO_SLUG" == "marauder-io/charger" ]; then .travis/install.sh; fi
+  - if [ "$TRAVIS_REPO_SLUG" == "aperture-sh/charger" ]; then .travis/install.sh; fi
 script:
   - ./gradlew check &&
-    if [ "$TRAVIS_REPO_SLUG" == "marauder-io/charger" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    if [ "$TRAVIS_REPO_SLUG" == "aperture-sh/charger" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     ./gradlew upload;
     fi
 # see also https://docs.travis-ci.com/user/languages/java/#Caching
